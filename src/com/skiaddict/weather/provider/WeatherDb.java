@@ -33,6 +33,7 @@ public class WeatherDb extends SQLiteOpenHelper {
     
     private static final String CREATE_TAGS_TABLE = "CREATE TABLE " + Tables.TAGS + " ("
             + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," 
+    		+ TagsColumns.TAG_IS_ALL + " BOOLEAN DEFAULT 'FALSE',"
     		+ TagsColumns.TAG_NAME + " TEXT DEFAULT '');";
     
     private static final String CREATE_LOCATION_TAGS_TABLE = "CREATE TABLE " + Tables.LOCATIONTAGS + " ("
@@ -53,10 +54,11 @@ public class WeatherDb extends SQLiteOpenHelper {
         db.execSQL(CREATE_LOCATION_TAGS_TABLE);
         
         // Add default tags.
-        long tagSkiing = insertTag(db, "Skiing");
-        long tagRoadBiking = insertTag(db, "Road Biking");
-        long tagMountainBiking = insertTag(db, "Mountain Biking");
-        long tagClimbing = insertTag(db, "Climbing");
+        long tagAll = insertTag(db, "All", true);
+        long tagSkiing = insertTag(db, "Skiing", false);
+        long tagRoadBiking = insertTag(db, "Road Biking", false);
+        long tagMountainBiking = insertTag(db, "Mountain Biking", false);
+        long tagClimbing = insertTag(db, "Climbing", false);
         
         // Add default locations.
         long locationSeattle = insertLocation(db, "Seattle", "47.54583", "-122.31361");
@@ -67,6 +69,15 @@ public class WeatherDb extends SQLiteOpenHelper {
         long locationStevensPass = insertLocation(db, "Stevens Pass", "48.3469", "-120.7203");
         long locationSnoqualmiePass = insertLocation(db, "Snoqualmie Pass", "47.427", "-121.418");
 
+        // All Tags. (TODO: REVIEW whether this is how I should handle "all"
+        tagLocation(db, locationSeattle, tagAll);
+        tagLocation(db, locationLeavenworth, tagAll);
+        tagLocation(db, locationSanJuanIsland, tagAll);
+        tagLocation(db, locationCrystalMountain, tagAll);
+        tagLocation(db, locationMountBaker, tagAll);
+        tagLocation(db, locationStevensPass, tagAll);
+        tagLocation(db, locationSnoqualmiePass, tagAll);
+        
         // Climbing Tags.
         tagLocation(db, locationLeavenworth, tagClimbing);
 
@@ -103,9 +114,10 @@ public class WeatherDb extends SQLiteOpenHelper {
     	return db.insert(Tables.LOCATIONS, null, values);
     }
     
-    private long insertTag(SQLiteDatabase db, String tagName) {
+    private long insertTag(SQLiteDatabase db, String tagName, boolean isAll) {
     	ContentValues values = new ContentValues();
     	values.put(WeatherContract.TagsColumns.TAG_NAME, tagName);
+    	values.put(WeatherContract.TagsColumns.TAG_IS_ALL, isAll);
     	return db.insert(Tables.TAGS, null, values);
     }
     

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -56,15 +57,23 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		
-		// Set up the tag filters (REVIEW: doing a query on the main thread here, but it should be pretty quick since we'll have a limited number of tags).
-		Cursor tagsCursor = getContentResolver().query(Tags.CONTENT_URI, TagsQuery.PROJECTION, null, null, Tags.DEFAULT_SORT_ORDER);
-		mTagsSpinnerAdapter = new TagsSpinnerAdapter(this, tagsCursor);
-        actionBar.setListNavigationCallbacks(mTagsSpinnerAdapter, this);
-        
         // Restore previously set tag filter
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        actionBar.setSelectedNavigationItem(prefs.getInt(WeatherPreferences.KEY_TAG_FILTER, 0));
-    }
+        int selectedTagIndex = prefs.getInt(WeatherPreferences.KEY_TAG_FILTER, 0);
+
+		// Set up the tag filters (REVIEW: doing a query on the main thread here, but it should be pretty quick since we'll have a limited number of tags).
+		Cursor tagsCursor = getContentResolver().query(Tags.CONTENT_URI, TagsQuery.PROJECTION, null, null, Tags.DEFAULT_SORT_ORDER);
+		tagsCursor.moveToPosition(selectedTagIndex);
+		int selectedTagId = tagsCursor.getInt(TagsQuery._ID);
+
+		mTagsSpinnerAdapter = new TagsSpinnerAdapter(this, tagsCursor);
+        actionBar.setListNavigationCallbacks(mTagsSpinnerAdapter, this);
+        actionBar.setSelectedNavigationItem(selectedTagIndex);
+        
+        Bundle args = new Bundle();
+        args.putInt(TAG_FILTER_ID, selectedTagId);
+        getSupportLoaderManager().initLoader(LOCATION_LOADER_ID, args, this);
+}
 
 	// OnNavigationListener Overrides
 	@Override
@@ -73,15 +82,15 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
         Cursor cursor = mTagsSpinnerAdapter.getCursor();
         cursor.moveToPosition(itemPosition);
 
+        Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        prefsEditor.putInt(WeatherPreferences.KEY_TAG_FILTER, itemPosition);
+        prefsEditor.commit();
+
         Bundle args = new Bundle();
         args.putInt(TAG_FILTER_ID, cursor.getInt(TagsQuery._ID));
-        
-        if (null == getSupportLoaderManager().getLoader(LOCATION_LOADER_ID)) {
-            getSupportLoaderManager().initLoader(LOCATION_LOADER_ID, args, this);
-        } else {
-            getSupportLoaderManager().restartLoader(LOCATION_LOADER_ID, args, this);
-        }
-		return true;
+        getSupportLoaderManager().restartLoader(LOCATION_LOADER_ID, args, this);
+
+        return true;
 	}
 
 	// LoaderManager.LoaderCallbacks<Cursor> Overrides

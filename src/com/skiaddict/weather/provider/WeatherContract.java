@@ -14,6 +14,7 @@ public class WeatherContract {
 
     interface TagsColumns {
         String TAG_NAME = "tagName";        
+        String TAG_IS_ALL = "tagIsAll";        
     }
 
     interface LocationTagsColumns {
