@@ -1,17 +1,7 @@
 <resources>
 
     <string name="app_name">Weather</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
-
-    <string-array name="postfilter_list">
-        <item>All</item>
-        <item>Rhapsody TV</item>
-        <item>Roundup</item>
-        <item>Cheat Sheet</item>
-        <item>Source Material</item>
-        <item>Senior Year</item>
-        <item>Friday Mixtape</item>
-        </string-array>
+    <string name="title_activity_main">Weather</string>
+    <string name="menu_new">New</string>
 </resources>

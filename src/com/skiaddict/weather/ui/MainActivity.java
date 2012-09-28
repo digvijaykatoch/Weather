@@ -1,9 +1,11 @@
 package com.skiaddict.weather.ui;
 
-import com.actionbarsherlock.R;
+import com.skiaddict.weather.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.skiaddict.weather.WeatherPreferences;
 import com.skiaddict.weather.provider.WeatherContract.Locations;
 import com.skiaddict.weather.provider.WeatherContract.Tags;
@@ -11,6 +13,7 @@ import com.skiaddict.weather.provider.WeatherContract.Tags;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -23,10 +26,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends SherlockFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, OnNavigationListener  {
 
-    private interface TagsQuery {
+	private interface TagsQuery {
         String[] PROJECTION = {
         		Tags._ID, Tags.TAG_NAME};
         int _ID = 0;
@@ -41,6 +45,7 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
     
     static private String TAG_FILTER_ID = "tagFilterId";
     static private int LOCATION_LOADER_ID = 0;
+    static private int ID_NEW_LOCATION = 0;
     
     private TagsSpinnerAdapter mTagsSpinnerAdapter;
     private LocationsAdapter mLocationsAdapter;
@@ -48,6 +53,7 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_Sherlock_ForceOverflow);
 		setContentView(R.layout.activity_main);
 
 		mLocationsAdapter = new LocationsAdapter(this, null);
@@ -74,6 +80,24 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
         args.putInt(TAG_FILTER_ID, selectedTagId);
         getSupportLoaderManager().initLoader(LOCATION_LOADER_ID, args, this);
 }
+
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+    	menu.add(Menu.NONE, ID_NEW_LOCATION, Menu.NONE, R.string.menu_new)
+        .setIcon(R.drawable.new_location)
+        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (ID_NEW_LOCATION == item.getItemId()) {
+			startActivity(new Intent(this, NewLocationActivity.class));
+			return true;
+		}
+		// TODO Auto-generated method stub
+		return super.onOptionsItemSelected(item);
+	}
 
 	// OnNavigationListener Overrides
 	@Override
