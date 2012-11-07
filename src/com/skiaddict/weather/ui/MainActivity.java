@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends SherlockFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, OnNavigationListener  {
 
@@ -53,7 +52,6 @@ public class MainActivity extends SherlockFragmentActivity implements LoaderMana
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        setTheme(R.style.Theme_Sherlock_ForceOverflow);
 		setContentView(R.layout.activity_main);
 
 		mLocationsAdapter = new LocationsAdapter(this, null);

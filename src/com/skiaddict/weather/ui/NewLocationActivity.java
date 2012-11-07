@@ -17,7 +17,7 @@ public class NewLocationActivity extends MapActivity {
         setContentView(R.layout.new_location_activity);
         mMapView = (WeatherMapView)findViewById(R.id.mapview);
 
-        mMapView.getController().setCenter(getPoint(47.54583,-122.31361));
+        mMapView.getController().setCenter(getPoint(47.6097,-122.3331));
         mMapView.getController().setZoom(17);
         mMapView.setBuiltInZoomControls(true);
 	}
